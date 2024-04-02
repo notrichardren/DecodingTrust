@@ -347,6 +347,34 @@ register_conv_template(
     )
 )
 
+# Custom mistral template
+register_conv_template(
+    Conversation(
+        name="mistral7b",
+        system="You are a helpful AI assistant. Engage in friendly conversation and provide informative, detailed responses to the user's questions.",
+        roles=("[INST]", "[/INST]"),
+        sep_style=SeparatorStyle.NO_COLON_SINGLE,
+        sep=" ",
+        messages=(),
+        offset=0,
+        stop_str="</s>",
+    )
+)
+
+# Custom gemma template
+register_conv_template(
+    Conversation(
+        name="gemma",
+        system="<bos>",
+        roles=("<start_of_turn>user\n", "<start_of_turn>model\n"),
+        sep_style=SeparatorStyle.NO_COLON_SINGLE,
+        sep=" ",
+        messages=(),
+        offset=0,
+        stop_str="<end_of_turn>",
+    )
+)
+
 register_conv_template(
     Conversation(
         name="airoboros_v1",
@@ -717,6 +745,19 @@ register_conv_template(
         sep="\n",
         stop_token_ids=[2, 396],
         stop_str="###",
+    )
+)
+
+# Robin default template
+register_conv_template(
+    Conversation(
+        name="default",
+        system="",
+        roles=("Human:", "Assistant:"),
+        messages=(),
+        offset=0,
+        sep_style=SeparatorStyle.NO_COLON_SINGLE,
+        sep="\n",
     )
 )
 

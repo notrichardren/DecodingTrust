@@ -1,3 +1,41 @@
+# Richard’s brief notes on DecodingTrust
+
+More complete notes in the video I attached in channel; watch that if you’re very confused. Please don’t be afraid to reach out but I probably will only be able to answer in reasonable Central European Time hours. I think I have encountered many other issues on the codebase I haven’t really commented on for brevity.
+
+Install decodingtrust:
+
+```bash
+git clone https://github.com/AI-secure/DecodingTrust.git && cd DecodingTrust
+conda create --name dt-test python=3.9 pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
+conda activate dt-test
+pip install -e .
+```
+
+DecodingTrust is meant to work on *chat* models, and that other types of models don’t work or will have a very high reject rate (or just don’t really make sense in the context of DecodingTrust).
+
+My impression is that to run DecodingTrust, you have to run many subevaluations, which then add up to aggregate scores. I got the subevaluations from the readme’s in the _perspectives_ folder (in src/dt). But some are incomplete, so then you might to look at _configs_ folder (in src/dt) and there might be more subevaluations to run. I’m still not completely sure if I’ve run all necessary subevaluations for many of the evals, which I haven't yet gotten to work end-to-end.
+
+_rocket_launch_evaluations.sh_ is my bash script for running all of them.
+
+To add a model to the evaluations "pipeline":
+- Add a _convtemplate_ for the given model (llama-2 has already been provided) in _conversation.py_
+    - _Mistral7b_ and _gemma_ have been added by me but should be double checked because I did it in a rush.
+- Add a yaml file in _model_config_. Look at examples, and then change the following:
+    - Specify “hf/hugging_face_path” as well as the correct tokenizer (which you may also need to manually define in some different tokenizer file, or maybe text will work)
+    - Test different torch_dtypes and make sure they work with the codebase
+
+This has been done for llama-2-chat versions that are 7b, 13b, 70b.
+
+Then, you add it the model to model_list in _rocket_launch_evaluations.sh_, then a colon, then the number of GPUs that will be required to run this model.
+
+Afterwards, results will be saved in results! Make sure that your code ran to the end in outputs directory. The results for each eval are inconveniently saved in a different format, which makes for a truly exciting and uncertain experience.
+
+For some results, to analyze it, you have to run _summarize.py_ which is commented because it runs with every dt-run but results in bugs if you run it without complete evaluations. Do uncomment for the section you think you’ve run every sub-eval on, and then you should be able to get results by running _dt-run_ (hopefully without bugs!).
+
+I think I got stereotype and adv-glue-plus-plus to work end-to-end; parts of machine_ethics, ood, and adv_demonstration to work too. Some other evals require both running it on the chat model, and then running some generations through Perplexity API or something in order to then recieve the final score (uses another model for the evaluation); I gave up on those evals for now.
+
+This codebase is very janky so I recommend getting your hands dirty and babysitting your runs to make sure they don’t eat up GPU time (errors here can result in taking up of long GPU times! Because the errors just run again and again.) Best of luck!
+
 # DecodingTrust: A Comprehensive Assessment of Trustworthiness in GPT Models
 
 ## Overview
